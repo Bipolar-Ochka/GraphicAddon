@@ -62,6 +62,17 @@ namespace GraphicAddon
             }
         }
 
+        public void GetRectangleFromMethod(double xPosition, double yPosition, double width, double height)
+        {
+            float scaleMultiplier = 100;
+            double yReal = -yPosition;
+            RectangleShape newRect = new RectangleShape(new Vector2f((float)xPosition*scaleMultiplier, (float)yReal*scaleMultiplier));
+            newRect.Size = new Vector2f((float)width*scaleMultiplier, (float)height*scaleMultiplier);
+            newRect.OutlineThickness = LineThickness;
+            newRect.OutlineColor = Color.Black;
+            toDraw.Add(newRect);
+        }
+
         #region WINDOW_EVENTS
         private void Window_MouseButtonPressed(object sender, MouseButtonEventArgs e)
         {
