@@ -12,12 +12,25 @@ namespace GraphicAddon
         private float zoom = 1f;
         private bool moving = false;
         private Vector2f oldPos = new Vector2f();
+        private List<Drawable> toDraw;
+        private readonly float LineThickness = 2f;
         public RenderWindow Window { get; private set; }
         private GraphicWindow()
         {
             ContextSettings set = new ContextSettings(1, 1, 4);
             Window = new RenderWindow(new VideoMode(800, 600), "Graphic", Styles.Default, set);
             DispatchWindowEvents(20, true);
+        }
+
+        private void DrawAll()
+        {
+            if(Window != null)
+            {
+                foreach(Drawable item in toDraw)
+                {
+                    Window.Draw(item);
+                }
+            }
         }
         public GraphicWindow(uint height=800, uint width=600, uint frameLimit=30, bool VSync=true, uint anitialisingLvl=4)
         {
@@ -44,7 +57,7 @@ namespace GraphicAddon
             {
                 Window.DispatchEvents();
                 Window.Clear(Color.White);
-                
+                DrawAll();
                 Window.Display();
             }
         }
@@ -60,10 +73,12 @@ namespace GraphicAddon
             }
             else if (e.Button == Mouse.Button.Right)
             {
-                //foreach (RectangleShape item in shapes)
-                //{
-                //    item.OutlineThickness = ShapeThickness;
-                //}
+                foreach (Drawable item in toDraw)
+                {
+                    if (item is RectangleShape itemRect) { 
+                       itemRect.OutlineThickness = LineThickness; 
+                    }
+                }
                 window.SetView(window.DefaultView);
             }
         }
@@ -80,19 +95,17 @@ namespace GraphicAddon
                 zoom = Math.Max(0.5f, zoom - 0.1f);
             }
             View view = window.GetView();
-            //view.Size = window.DefaultView.Size;
             view.Zoom(zoom);
             window.SetView(view);
-            //foreach (RectangleShape item in shapes)
-            //{
-            //    item.OutlineThickness *= zoom;
-            //}
+            foreach (Drawable item in toDraw)
+            {
+                if (item is RectangleShape itemRect)
+                {
+                    itemRect.OutlineThickness *= zoom;
+                }
+            }
         }
 
-        private void RescalingObjects() 
-        { 
-
-        }
 
         private void Window_Resized(object sender, SizeEventArgs e)
         {
