@@ -4,6 +4,7 @@ using System.Text;
 using SFML.System;
 using SFML.Graphics;
 using SFML.Window;
+using System.Diagnostics;
 
 namespace GraphicAddon
 {
@@ -12,8 +13,12 @@ namespace GraphicAddon
         private float zoom = 1f;
         private bool moving = false;
         private Vector2f oldPos = new Vector2f();
-        private List<Drawable> toDraw;
+        private List<Drawable> toDraw = new List<Drawable>();
         private readonly float LineThickness = 2f;
+        private int rectangleLimit = 50000;
+        private Color rectangleColor = Color.Black;
+        private Color axisColor = Color.Blue;
+        private float axisStep = 0.5f;
         public RenderWindow Window { get; private set; }
         private GraphicWindow()
         {
@@ -24,11 +29,11 @@ namespace GraphicAddon
 
         private void DrawAll()
         {
-            if(Window != null)
+            if(this.Window != null)
             {
-                foreach(Drawable item in toDraw)
+                foreach(Drawable item in this.toDraw)
                 {
-                    Window.Draw(item);
+                    this.Window.Draw(item);
                 }
             }
         }
@@ -64,13 +69,29 @@ namespace GraphicAddon
 
         public void GetRectangleFromMethod(double xPosition, double yPosition, double width, double height)
         {
+            if(toDraw == null)
+            {
+                toDraw = new List<Drawable>();
+            }
+            if (toDraw?.Count > rectangleLimit)
+            {
+                return;
+            }
             float scaleMultiplier = 100;
             double yReal = -yPosition;
-            RectangleShape newRect = new RectangleShape(new Vector2f((float)xPosition*scaleMultiplier, (float)yReal*scaleMultiplier));
+            RectangleShape newRect = new RectangleShape();
             newRect.Size = new Vector2f((float)width*scaleMultiplier, (float)height*scaleMultiplier);
+            newRect.Position = new Vector2f((float)(xPosition) * scaleMultiplier, (float)(yReal) * scaleMultiplier);
+            Trace.WriteLine($"real coord {xPosition}:{yPosition} | mod cords {newRect.Position.X}:{newRect.Position.Y}");
             newRect.OutlineThickness = LineThickness;
-            newRect.OutlineColor = Color.Black;
+            newRect.OutlineColor = rectangleColor;
             toDraw.Add(newRect);
+            if(toDraw.Count == 1)
+            {
+                var axis = Optionals.getAxisLines((RectangleShape)toDraw[0], axisColor, LineThickness, (float)(xPosition + width), (float)(yPosition), axisStep, (float)xPosition, (float)(yPosition-height));
+                toDraw.AddRange(axis.lines);
+                toDraw.AddRange(axis.marks);
+            }
         }
 
         #region WINDOW_EVENTS

@@ -8,7 +8,7 @@ namespace GraphicAddon
 {
     static class Optionals
     {
-        static (List<LineShape> lines, List<Text> marks) getAxisLines(RectangleShape shape, Color color, float thickness, float xMax, float yMax, float step, float xMin = 0, float yMin = 0)
+        internal static (List<LineShape> lines, List<Text> marks) getAxisLines(RectangleShape shape, Color color, float thickness, float xMax, float yMax, float step, float xMin = 0, float yMin = 0)
         {
             int offset = 60;
             int lenghtDiv = 10;
