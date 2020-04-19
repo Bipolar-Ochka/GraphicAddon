@@ -15,7 +15,7 @@ namespace GraphicAddon
         private Vector2f oldPos = new Vector2f();
         private List<Drawable> toDraw = new List<Drawable>();
         private readonly float LineThickness = 2f;
-        private int rectangleLimit = 50000;
+        private uint rectangleLimit = 50000;
         private Color rectangleColor = Color.Black;
         private Color axisColor = Color.Blue;
         private float axisStep = 0.5f;
@@ -53,6 +53,7 @@ namespace GraphicAddon
             Window.MouseButtonReleased += new EventHandler<MouseButtonEventArgs>(Window_MouseButtonReleased);
             Window.MouseMoved += new EventHandler<MouseMoveEventArgs>(Window_MouseMoved);
             Window.MouseWheelScrolled += new EventHandler<MouseWheelScrollEventArgs>(Window_MouseWheelMoved);
+
             Window.SetActive();
         }
 
@@ -66,7 +67,32 @@ namespace GraphicAddon
                 Window.Display();
             }
         }
+        public void RenderThread()
+        {
+            Window.SetActive(true);
+            while (Window.IsOpen)
+            {
+                Window.DispatchEvents();
+                Window.Clear(Color.White);
+                DrawAll();
+                Window.Display();
+            }
+            //Window.SetActive(false);
 
+        }
+
+        public void SetRectangleLimit(uint limit)
+        {
+            this.rectangleLimit = limit;
+        }
+
+        public void ChangeWindowSettings(uint width, uint height, uint anitialisingLvl, uint fpsLimit, bool isVsync, int maxItemCount)
+        {
+            ContextSettings set = new ContextSettings(1, 1, anitialisingLvl);
+            Window = new RenderWindow(new VideoMode(width, height), "Graphic", Styles.Default, set);
+            DispatchWindowEvents(fpsLimit, isVsync);
+            SetRectangleLimit((uint)maxItemCount);
+        }
         public void GetRectangleFromMethod(double xPosition, double yPosition, double width, double height)
         {
             if(toDraw == null)
@@ -77,12 +103,15 @@ namespace GraphicAddon
             {
                 return;
             }
+            if(width <1e-3 || height < 1e-3)
+            {
+                return;
+            }
             float scaleMultiplier = 100;
             double yReal = -yPosition;
             RectangleShape newRect = new RectangleShape();
             newRect.Size = new Vector2f((float)width*scaleMultiplier, (float)height*scaleMultiplier);
             newRect.Position = new Vector2f((float)(xPosition) * scaleMultiplier, (float)(yReal) * scaleMultiplier);
-            Trace.WriteLine($"real coord {xPosition}:{yPosition} | mod cords {newRect.Position.X}:{newRect.Position.Y}");
             newRect.OutlineThickness = LineThickness;
             newRect.OutlineColor = rectangleColor;
             toDraw.Add(newRect);

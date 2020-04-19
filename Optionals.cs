@@ -8,6 +8,7 @@ namespace GraphicAddon
 {
     static class Optionals
     {
+        
         internal static (List<LineShape> lines, List<Text> marks) getAxisLines(RectangleShape shape, Color color, float thickness, float xMax, float yMax, float step, float xMin = 0, float yMin = 0)
         {
             int offset = 60;
@@ -26,7 +27,7 @@ namespace GraphicAddon
             lines.Add(yAxis);
             lines.Add(xAxis);
             List<Text> numberMarks = new List<Text>();
-            Font font = new Font("tmr.ttf");
+            Font font = new Font($"{Environment.CurrentDirectory}\\tmr.ttf");
             uint fontSize = 13;
             for (int i = 0; i < countForX + 1; i++)
             {
