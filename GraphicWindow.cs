@@ -14,7 +14,7 @@ namespace GraphicAddon
         private bool moving = false;
         private Vector2f oldPos = new Vector2f();
         private List<Drawable> toDraw = new List<Drawable>();
-        private readonly float LineThickness = 2f;
+        private readonly float LineThickness = 1.5f;
         private uint rectangleLimit = 50000;
         private Color rectangleColor = Color.Black;
         private Color axisColor = Color.Blue;
@@ -110,8 +110,15 @@ namespace GraphicAddon
             float scaleMultiplier = 100;
             double yReal = -yPosition;
             RectangleShape newRect = new RectangleShape();
-            newRect.Size = new Vector2f((float)width*scaleMultiplier, (float)height*scaleMultiplier);
-            newRect.Position = new Vector2f((float)(xPosition) * scaleMultiplier, (float)(yReal) * scaleMultiplier);
+            float scaleByScreenX = 1;
+            float scaleByScreenY = 1;
+            if(toDraw.Count == 0)
+            {
+                scaleByScreenX = Window.Size.X / (float)width;
+                scaleByScreenY = Window.Size.Y / (float)height;
+            }
+            newRect.Size = new Vector2f((float)width*scaleMultiplier*scaleByScreenX, (float)height*scaleMultiplier*scaleByScreenY);
+            newRect.Position = new Vector2f((float)(xPosition) * scaleMultiplier * scaleByScreenX, (float)(yReal) * scaleMultiplier * scaleByScreenY);
             newRect.OutlineThickness = LineThickness;
             newRect.OutlineColor = rectangleColor;
             toDraw.Add(newRect);
